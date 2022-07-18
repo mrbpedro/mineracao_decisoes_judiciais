@@ -1,0 +1,306 @@
+---
+title: "Mineração de dados: decisões judiciais"
+author: "Pedro"
+date: '2022-07-17'
+output: html_document
+---
+
+# Pacotes utilizados
+```{r}
+library(wordcloud)
+library(wordcloud2)
+library(BiocManager, Rgraphiz)
+library(tm, NLP)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+TM (*text mining*) e NLP(*Natural Language process*) são as duas principais técnicas de análise de mineração de textos. 
+
+*World cloud1* e *World Cloud* proporcionam a nuvem de palavras mais frequentes nos textos.
+
+## Carregando as decisões
+```{r}
+txt <- system.file("texts", "txt", package = "tm") #carregando os as decisões em formato txt
+
+ovid <- VCorpus(DirSource(txt, encoding = "UTF-8"),
+                 readerControl = list(language = "por"))
+#preparando os textos para serem lidos e processados pelo R
+```
+
+
+## Tokenização e remoção de termos indesejados
+```{r}
+ovid = tm_map(ovid, removeWords,stopwords('portuguese'))
+#stopwords portuguese é um banco criado por colaboradores para extrair palavras indesejadas na análise
+
+ovid = tm_map(ovid, stripWhitespace)
+#reduz os espaços em branco
+
+ovid = tm_map(ovid, removePunctuation)
+#extrai pontuação
+
+ovid = tm_map(ovid, removeNumbers)
+#extrai números
+
+ovid = tm_map(ovid, content_transformer(tolower))
+#passa todas as palavras para caixa baixa para criar um padrão
+```
+
+O pacote TM têm diversas funções para extrair caracteres que são indesejados na análise de textos como artigos e preposições. Mesmo com a aplicação de todos estes métodos, diversas palavras repetidas, típicas aos textos jurídicos, permaneceram. Além disso, nomes próprios permaneceram, números de artigos, datas e etc.
+
+Por essa razão foi necessário acrescentar diversas outras palavaras que, ainda, deveriam ser desconsideradas. 
+
+O comando **removeWords** permite essa extração manualmente.
+
+```{r}
+ovid <- tm_map(ovid, removeWords, c("ricardo", "nesse", "neste", 
+                                    "viii", "xii", "xiii",  "xiv",
+                                    "col","reynaldo",
+                                    "soares", "abrigadas" , "abstratas",
+                                    "configurar",  "confira", "confirmação" , 
+                                    "conheço", "art", "ronaldo", "tjpe", 
+                                    "rogerio", "pimentel", "pgc",
+                                    "anos", "ser", "lei",
+                                    "ordem", "tribunal", "corpus",
+                                    "habeas", "caso", "pena", "ainda",
+                                    "aplicação", "substituição", "sendo",
+                                    "fls", "paulo", "forma", "situação",
+                                    "superior", "conforme", "custodiada",
+                                    "além", "deve", "dje", "bem", "tal",
+                                    "caput", "iii", "onde", "sobre", 
+                                    "causa", "local", "necessidade",
+                                    "turma", "razão", "assim", "sob",
+                                    "ter", "código", "cpp", "thais",
+                                    "fato", "dois", "tendo", "sentido", "dentro",
+                                    "grifei", "termos", "quais", "ambos",
+                                    "nesta", "página", "relator", "relatório", "ericles",
+                                    "bangkok", "catarina",  "catarinense",
+                                    "boa", "schietti", "admitir", "seguindo",
+                                    "conferido", "conferir", "conter", "constando",
+                                    "cultura", "deletérios", "félix", "marina",
+                                    "marcelo", " àqueles", "arruda", "brasileiro",
+                                    "brasília", "aptos", "configurar", "configurada",
+                                    "considerada", "contato", "corroboram", "daí",
+                                    "demonstradas", "demonstre", "dispõem", "exigir",
+                                    "exigiria", "leopoldo", "lucas",
+                                    "rio", "preventiva", "autos", 
+                                    "ofício", "paciente", "concessão",
+                                    "defesa", "janeiro", "concreto",
+                                    "acometido", "alyne", "alguém", 
+                                    "aludido", "analisada", "apenada", "apenados",
+                                    "analógica", "antecipada", "apoiar", "apadrinhada",
+                                    "aplicável", "arbitrariedade", "assiduamente",
+                                    "assiste", "atente", "avaliada", "avisos", 
+                                    "basilares", "beneficente", "cabal", "cadernos", 
+                                    "calibre", "canaro", "célere", "celeridade",
+                                    "cargo", "colheu", "comandada", "comitê",
+                                    "compatível", "competência", "compreensão",
+                                    "concretização", "condenadas", "certidões",
+                                    "ciente", "admitirá",
+                                    "assiduament", "aluno", "alyn",
+                                    "damião", "deferida", "deferir",
+                                    "atent", "arbitrariedad", "amplitud",
+                                    "amplo", "apenado", "apontada","arbitrariedad",
+                                    "armada","assiduament", "assist", "atent", "atuando",
+                                    "ausentar", "autorizadora", "auxiliada", "avaliado",
+                                    "aviso", "basilar",  "batizada", 
+                                    "beneficent", "beneficiário", "burocratizada",
+                                    "certidõ",  "cient", "clarament", "coator", "colaciono",
+                                    "conferida" , "contrariedad", 
+                                    "contraturno",    "controvérsia" , "convivência",
+                                    "damião", "debilitado", "deferida", "deferir",
+                                    "delimitar", "denotada",  "depen",  "desconstituir",
+                                    "descrito", "convocado",  "correspondência", "crescent",
+                                    "cumprida", "cumprido", "despacho", "desproveu",  "desvalor",
+                                    "detençõ","diapasão", "diferent", "direcionam", "discriminação",
+                                    "doença", "dominant",   "educação",   "eficácia", "eleita", "elenca",
+                                    "elencarem", "eliminação", "embasada" , "ementado", "emitido",  "empecilho",
+                                    "adpf", "coisas")) 
+```
+
+
+## Preparando a nuvem de palavras
+
+```{r}
+tdm <-  TermDocumentMatrix(ovid)
+#armazenando palavras com maior frequência
+
+m = as.matrix(tdm) #transformando em matriz
+v = sort(rowSums(m), decreasing = TRUE) #ordenando pela frequência
+d = data.frame(word = names(v), freq = v) #transformando em dataframe
+
+library(RColorBrewer) #pacote complementar para cores no wordcloud
+
+wordcloud2(d)
+
+```
+
+A nuvem de palavras indica que a principal pena aplicada entre as decisões analisadas é a prisão e a prisão domiciliar. Mais do que isso, a maioria esmagadora dos crimes julgados envolvem tráfico de drogas.
+
+
+## Análise sobre os papéis de gênero no papel do cuidado
+
+A análise busca analisar os papéis de gênero na função do cuidado das crianças a partir das decisões. A hipótese é de que há a predominância de figuras femininas nesse papel, enquanto que o papel das figuras masculinas é diminuto. Mais do que isso, na perda de guarda pelas mães, os juízes atribuem a guarda para figuras femininas familiares (avó, tias, etc.), reforçando tais papéis de gênero.
+
+Para isso, pesquisei a correlação entre palavras chave que podem indicar tais fatores: sobretudo a ideia é avaliar como palavras como "`cuidados`, `guarda`, `filhos`, `filhas`" estão associados com as palavras como "`mãe`, `mulheres`, `tia`, `avó`" ou com figuras masculinas como "`avô`, `tio` e `pai` ". Ou seja, o que importa é analisar o gênero.
+
+Ao calcular essas correlações, é possível estruturá-las em forma de matriz e construir um gráfico que permite visualizar a asscocição entre palavras em forma de rede. 
+
+
+## Pesquisa com a palavra "pai"
+
+```{r}
+library(tidyverse)
+library(dplyr)
+
+pai <- findAssocs(tdm, "pai", 0.1) #palavras associadas à palavra pai
+
+pai <- data.frame(pai) # passando para data.frame
+ 
+pai <- tibble::rownames_to_column(pai) #transformando o índice em coluna.
+
+#correlação com as palavras de interesse
+pai %>% 
+  dplyr::filter(rowname %in% c("guarda", "cuidados", "criancas", "filhos", "filhas"))
+
+```
+
+Como se pode ver, a palavra `pai` não tem correlação com `guarda`, `cuidados` ou `crianças`, apenas com `filhos` e `filhas`, mas com baíxissimo grau de associação.
+
+Repito o mesmo processo com outras palavras a seguir. Por vezes, os níveis de correlação mínimo pesquisados foram modificados, porque algumas palavras são mais mencionadas do que outras e, portanto, o conjunto de palavras com as quais elas têm correlação é muito maior, gerando uma matriz de correlação muito grande. 
+
+Além disso, quando não aparece nenhuma associação com o conjunto de palavras de interesse, os resultados são descartados.
+
+## Pesquisa com outras palavras
+
+
+```{r}
+library(tidylog)
+
+library(dplyr)
+
+
+#Tias
+tias <- findAssocs(tdm, "tias", 0.1)
+tias <- data.frame(tias)
+tias <- tibble::rownames_to_column(tias)
+
+#O termo "tia" não deu nenhuma qualquer correlação de interesse.
+
+#guarda
+guarda <- data.frame(findAssocs(tdm, "guarda", c(0.90)))
+guarda <- tibble::rownames_to_column(guarda)
+
+
+#cuidados
+cuidados <- data.frame(findAssocs(tdm, "cuidados", 0.7))
+cuidados <- tibble::rownames_to_column(cuidados)
+
+#cuidado no singular é muito pouco empregado.
+
+
+#avó
+avo <- data.frame(findAssocs(tdm, "avó", 0.1))
+avo <- tibble::rownames_to_column(avo)
+
+#avô é muito pouco empregado.
+
+#homem
+homem <- data.frame(findAssocs(tdm, "homem", 0.1))
+homem <- tibble::rownames_to_column(homem)
+
+
+#mulheres
+
+mulheres <- data.frame(findAssocs(tdm, "mulheres", 0.1))
+mulheres <- tibble::rownames_to_column(mulheres)
+
+#mulher
+mulher <- data.frame(findAssocs(tdm, "mulher", 0.7))
+mulher <- tibble::rownames_to_column(mulher)
+
+
+#filhos
+filhos <- data.frame(findAssocs(tdm, "filhos", 0.7))
+filhos <- tibble::rownames_to_column(filhos)
+
+#crianças
+criancas <- data.frame(findAssocs(tdm, "crianças", 0.7))
+criancas <- tibble::rownames_to_column(criancas)
+
+
+#tio
+tio <- data.frame(findAssocs(tdm, "tio", 0.1))
+tio <- tibble::rownames_to_column(tio)
+
+#filhas
+filhas <- data.frame(findAssocs(tdm, "filhas", 0.7))
+filhas  <- tibble::rownames_to_column(filhas)
+
+library(purrr) #carregar este pacote para utilizar a função reduce que auxiliará na junção de muitos bancos ao mesmo tempo.
+
+matriz <- reduce(list(avo, pai, cuidados, mulheres, mulher, filhos, criancas,
+                   tio, filhas, guarda), dplyr::left_join, by = 'rowname')
+
+save(matriz, file = "matriz.RData")
+
+```
+
+---
+
+## Juntando resultados de todas as buscas numa matriz
+
+```{r}
+
+load("matriz.RData")
+
+matriz1 <- matriz %>% 
+  filter(rowname %in% c("avo", "pai", "cuidados", "mulheres", "mulher", "filhos", "criancas","tio", "filhas", "guarda"))
+
+save(matriz1, file = "matriz1.RData")
+matriz1
+
+```
+
+## Preparando os dados para o plot
+```{r}
+load("matriz1.RData")
+
+matriz1g <- matriz1 %>% #arranjando os valores em duas colunas para plotá-los.
+  gather(destination, weight, 2:11)
+
+cuid <- matriz1g %>% 
+  filter(!is.na(weight)) #filtrando os valores missings
+
+save(cuid, file = "cuid.RData")
+
+head(cuid)
+
+```
+
+
+## Plotagem
+```{r}
+
+load("cuid.RData")
+library(igraph) #usando o pacote igraph para plotar a rede
+
+g <- graph_from_data_frame(cuid, directed = FALSE)
+l <- layout_with_fr(g)
+
+
+plot(g, vertex.label = V(g)$name, edge.size=20, vertex.size=20, 
+     edge.arrow.size=05, vertex.label.dist=0, 
+      vertex.size2 = 30, vertex.label.font = 2, vertex.color = "purple",
+     vertex.frame.color = "blue", vertex.label.color = "black",
+     layout = l)
+
+
+```
+
+
+ A rede de associações demonstra a partir da distância entre os vértices o grau de associação entre as palavras. Como se pode notar, em geral as figuras do gênero feminino (`avó`, `mulheres`, `mulher`) estão associadas ao cuidado, à guarda e a filhos e a crianças. Ao mesmo tempo, é notável como a figura masculina do pai está distante de todas essas palavras relacionadas ao cuidado. A exceção é a figura masculina do tio que parece mais associada ao cuidado.
+ 
+Tal rede demonstra que as decisões jurídicas reflitem uma realidade social em que as figuras masculinas se ausentam do cuidado e da guarda. Mas ao mesmo tempo, é provável que estas próprias decisões reproduzam tal dinâmica, de modo que em caso de prisão da mãe a guarda é transferida para outras figuras femininas, reforçando a ideia social de que as mulheres são responsáveis pelo cuidado. 
+
+---

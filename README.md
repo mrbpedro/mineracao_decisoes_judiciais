@@ -30,7 +30,6 @@ Para isso, utilizei os pacotes `tm` e `NPL` no R para:
 A análise de frequência de palavras pode ser visualizada por meio da nuvem de palavras, a partir do pacote `wordcloud`. A nuvem de palavras demonstra acima de tudo que o principal crime julgado nas decisões é o tráfico de drogas. Este achado toca em toda uma discussão maior sobre qual seria a abordagem mais adequada para a questão da comercialização e uso de psicotrópicos em nossa sociedade. Fato é que a condenação por tráfico é a principal causa de encarceramento no Brasil e se reflete também no julgamento de mães com filhos na fase de primeira infância, uma vez que o encarceramento desencadeia um efeito danoso sobre o desenvolvimento das crianças nesta fase.
 
 
-![IMAGE_DESCRIPTION](http://imgur.com/N1dHk0e)
 
 A nuvem de palavras demonstra também alta frequência do termo *domiciliar*, o que sugere um possível impacto da MLPI na substituição da pena preventiva pela domiciliar. Esta hipótese é mais explorada na pesquisa.
 
@@ -39,6 +38,10 @@ A nuvem de palavras demonstra também alta frequência do termo *domiciliar*, o 
 
 Nessa parte, eu busquei demonstrar como a análise das decisões reflete os papéis sociais de gênero na função do cuidado. Isto é, como há uma maior associação entre figuras familiares femininas como (mulher, mulheres, tia, avó) com palavras como "guarda", "cuidado", "filhos" e "filhas" do que com figuras masculinas como "pai" e "tio". 
 
+![IMAGE_DESCRIPTION](rede.jpeg)
+
 A análise de redes demonstra como as palavras "cuidado" e "guarda" estão correlacionadas com uma rede de figuras femininas, sobretudo a avó, ao passo que o termo "pai" está completamente isolado desta rede.
 
 Isso reflete uma realidade brasileira, na qual os homens com frequência abandonam e não se encarregem da função do cuidado. Ao mesmo tempo, esta análise demonstra que as decisões judiciais provalvemente reforçam tais papéis. A alta associação entre guarda e avó sugere que, com frequência, em caso de prisão preventiva, a guarda é transferida para a avó.
+
+

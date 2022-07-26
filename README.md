@@ -29,6 +29,9 @@ Para isso, utilizei os pacotes `tm` e `NPL` no R para:
 
 A análise de frequência de palavras pode ser visualizada por meio da nuvem de palavras, a partir do pacote `wordcloud`. A nuvem de palavras demonstra acima de tudo que o principal crime julgado nas decisões é o tráfico de drogas. Este achado toca em toda uma discussão maior sobre qual seria a abordagem mais adequada para a questão da comercialização e uso de psicotrópicos em nossa sociedade. Fato é que a condenação por tráfico é a principal causa de encarceramento no Brasil e se reflete também no julgamento de mães com filhos na fase de primeira infância, uma vez que o encarceramento desencadeia um efeito danoso sobre o desenvolvimento das crianças nesta fase.
 
+
+![IMAGE_DESCRIPTION](http://imgur.com/N1dHk0e)
+
 A nuvem de palavras demonstra também alta frequência do termo *domiciliar*, o que sugere um possível impacto da MLPI na substituição da pena preventiva pela domiciliar. Esta hipótese é mais explorada na pesquisa.
 
 
